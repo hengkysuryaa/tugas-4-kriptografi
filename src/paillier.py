@@ -21,4 +21,5 @@ def generateKey(p, q):
         }
         return keys
 
-print(generateKey(7, 11))
+if __name__ == "__main__":
+    print(generateKey(7, 11))

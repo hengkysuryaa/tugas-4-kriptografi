@@ -12,4 +12,5 @@ def generateKey(p):
     }
     return keys
 
-print(generateKey(2357)) 
+if __name__ == "__main__":
+    print(generateKey(2357)) 

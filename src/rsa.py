@@ -12,7 +12,8 @@ def getPublicKeyList(n):
 def encodeText(p):
     enc = ''
     for char in p.lower():
-        idx = str(string.ascii_lowercase.rfind(char))
+        # A=01, B=02, ..., Z = 26
+        idx = str(string.ascii_lowercase.rfind(char)+1)
         enc += idx.zfill(2)
     return enc
 
@@ -23,7 +24,7 @@ def decodeText(c):
         list.append(c[idx:idx+2])
     
     for item in list:
-        dec += string.ascii_lowercase[int(item)]
+        dec += string.ascii_lowercase[(int(item)-1)%26]
 
     return dec
 
@@ -34,7 +35,6 @@ def generateKey(p, q):
         public_keys = getPublicKeyList(toisent)
         e = secrets.choice(public_keys)
         d = getInversion(toisent, e)
-        # return e, d, n
         keys = {
             "public" : (e, n),
             "private" : (d, n)
@@ -47,44 +47,74 @@ def encrypt(plaintext, e, n):
     # TODO: apakah 26 alphabet saja, m bebas (?), jika m tidak habis dibagi pesan
     # output angka/teks
     enc = encodeText(plaintext)
-    print(enc)
     cipher = ''
-    nBlock = len(str(n))-1
-    # if (len(enc) % nBlock != 0):
-    for i in range(0, len(enc), nBlock):
-        #print(i)
-        c = (int(enc[i:nBlock+i]) ** e) % n
-        print(c, (int(enc[i:nBlock+i])))
+    nBlock = len(str(n))
+    i = 0
+    while i < (len(enc) - (len(enc) % nBlock)):
+        val = int(enc[i:i+nBlock])
+        # cek apakah val >= n-1
+        if val >= n-1:
+            # ciphering 
+            val = int(enc[i:i+nBlock-1])
+            i -= 1
+        i += nBlock
+        c = (val ** e) % n
         cipher += str(c).zfill(nBlock)
-    print(i)
-    if (len(enc) % nBlock != 0):
+        #print(val, c)
+
+    # sisa angka, jika ada
+    if (i < len(enc)):
         c = (int(enc[i:]) ** e) % n
-        print(enc[i:], c)
-        cipher += str(c)
-    # else:
-    #     print("error")
+        cipher += str(c).zfill(nBlock)
+        #print("sisa", enc[i:], c)
+        #print("cipher", cipher)
     return cipher
 
 def decrypt(ciphertext, d, n):
-    enc = encodeText(ciphertext)
-    # plain = ''
-    # nBlock = len(str(n))-1
-    # if (len(enc) % nBlock == 0):
-    #     for i in range(0, len(enc), nBlock):
-    #         #print(i)
-    #         c = (int(enc[i:nBlock+i]) ** e) % n
-    #         #print(c, (int(enc[i:nBlock+i])))
-    #         plain += str(c)
-    # else:
-    #     print("error")
-    # return plain
+    dec = ciphertext
+    plain = ''
+    nBlock = len(str(n))
+    i = 0
+    while i < (len(dec) - (len(dec) % nBlock)):
+        val = int(dec[i:i+nBlock])
+        # cek apakah val >= n-1
+        if val >= n-1:
+            # ciphering 
+            val = int(dec[i:i+nBlock-1])
+            i -= 1
+        i += nBlock
+        p = (val ** d) % n
+        if (len(str(p))%2 != 0):
+            plain += str(p).zfill(len(str(p))+1)
+        else:
+            plain += str(p)
+        #print(val, c)
+
+    # sisa angka, jika ada
+    if (i < len(dec)):
+        p = (int(dec[i:]) ** d) % n
+        plain += str(p).zfill(nBlock)
+        #print("sisa", enc[i:], c)
+    return plain
     
-# if (isPrime(2) and isPrime(3)):
-#     print("prime")
-#print(getPublicKeyList(3220))
-print(generateKey(47, 71))
-# print(e, d, n)
-# print(encodePlaintext("HELOALICE"))
-#print(encrypt("HELLOALICE", 79, 3337))
-#print(encrypt("HELLOALICE", 1019, 3337))
-#print(decodeText("081125").upper())
+if __name__ == "__main__":
+    teks = "sayasedangbelajarkripto"
+
+    cipher_num = encrypt(teks, 79, 3337)
+    #print("cipher", decodeText(cipher_num))
+    
+    dec = decrypt(cipher_num, 1019, 3337)
+    print("hasil dekripsi", decodeText(dec))
+    
+    if (teks == decodeText(dec)):
+        print("didekripsi menjadi semula")
+    
+    #encoded = encodeText(teks)
+    # if (isPrime(2) and isPrime(3)):
+    #     print("prime")
+    #print(getPublicKeyList(3220))
+    #print(generateKey(47, 71))
+    # print(e, d, n)
+    # print(encodePlaintext("HELOALICE"))
+    #print(encrypt("HELLOALICE", 1019, 3337))
+    #print(decodeText("081125").upper())
