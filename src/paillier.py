@@ -58,6 +58,7 @@ def encrypt(plainteks, g, n):
 
     # sisa angka, jika ada
     if (i < len(enc)):
+        val = int(enc[i:])
         c = ((g**val) * (r**n)) % (n**2)
         cipher += str(c) + " "
         #print("sisa", enc[i:], c)
