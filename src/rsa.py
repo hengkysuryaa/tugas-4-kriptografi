@@ -1,5 +1,5 @@
 import math, secrets, string
-from util import isPrime, getInversion
+from util import isPrime, getInversion, encodeText
 
 def getPublicKeyList(n):
     # Generate kandidat public key
@@ -8,14 +8,6 @@ def getPublicKeyList(n):
         if math.gcd(i,n) == 1:
             list.append(i)
     return list
-
-def encodeText(p):
-    enc = ''
-    for char in p.lower():
-        # A=01, B=02, ..., Z = 26
-        idx = str(string.ascii_lowercase.rfind(char)+1)
-        enc += idx.zfill(2)
-    return enc
 
 def decodeText(c):
     dec = ''
@@ -93,17 +85,21 @@ def decrypt(ciphertext, d, n):
     # sisa angka, jika ada
     if (i < len(dec)):
         p = (int(dec[i:]) ** d) % n
-        plain += str(p).zfill(nBlock)
+        if (len(str(p))%2 != 0):
+            plain += str(p).zfill(len(str(p))+1)
+        else:
+            plain += str(p)
         #print("sisa", enc[i:], c)
     return plain
     
 if __name__ == "__main__":
-    teks = "sayasedangbelajarkripto"
-
-    cipher_num = encrypt(teks, 79, 3337)
+    teks = "helloalicenicetomeetyou"
+    keys = generateKey(83, 101)
+    
+    cipher_num = encrypt(teks, keys["public"][0], keys["public"][1])
     #print("cipher", decodeText(cipher_num))
     
-    dec = decrypt(cipher_num, 1019, 3337)
+    dec = decrypt(cipher_num, keys["private"][0], keys["private"][1])
     print("hasil dekripsi", decodeText(dec))
     
     if (teks == decodeText(dec)):
@@ -112,7 +108,7 @@ if __name__ == "__main__":
     #encoded = encodeText(teks)
     # if (isPrime(2) and isPrime(3)):
     #     print("prime")
-    #print(getPublicKeyList(3220))
+    #print(getPublicKeyList(77))
     #print(generateKey(47, 71))
     # print(e, d, n)
     # print(encodePlaintext("HELOALICE"))

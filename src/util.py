@@ -1,3 +1,5 @@
+import string
+
 def isPrime(x):
     # Cek apakah sebuah angka bilangan prima
     if x > 1:
@@ -18,3 +20,19 @@ def getInversion(n, m):
         return val
     except:
         return None 
+
+def encodeText(p):
+    enc = ''
+    for char in p.lower():
+        # A=01, B=02, ..., Z = 26
+        idx = str(string.ascii_lowercase.rfind(char)+1)
+        enc += idx.zfill(2)
+    return enc
+
+def encodeTextOneDigit(p):
+    enc = ''
+    for char in p.lower():
+        # A=1, B=2, ..., Z = 26
+        idx = str(string.ascii_lowercase.rfind(char)+1)
+        enc += idx
+    return enc
