@@ -84,9 +84,9 @@ if __name__ == "__main__":
     print(keys)
     text = "halohalobandungibukota"
     enc = encrypt(text, keys["public"][0], keys["public"][1], keys["public"][2])
-    #print(encodeTextOneDigit(text))
-    #print(enc)
+    print(encodeTextOneDigit(text))
+    print(enc)
     dec = decrypt(enc, keys["private"][0], keys["private"][1])
     print(dec)
-    # if (dec == encodeTextOneDigit(text)):
-    #     print("didekripsi menjadi semula")
+    if (dec == encodeTextOneDigit(text)):
+        print("didekripsi menjadi semula")
