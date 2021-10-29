@@ -1,7 +1,8 @@
-import secrets
+import secrets, math
+import string
 
 def add(p1, p2, p):
-    #print(p2[0] - p1[0])
+    #print(p2[1] - p1[1], p2[0] - p1[0])
     m = ((p2[1] - p1[1]) * pow((p2[0] - p1[0]), -1, p)) % p
     xr = ((m**2) - p1[0] - p2[0]) % p
     yr = (m*(p1[0] - xr) - p1[1]) % p
@@ -16,7 +17,7 @@ def mult(point, k, a ,p):
         xr = ((m**2) - 2*x) % p
         yr = (m*(x-xr) - y) % p
         point2 = (xr, yr)
-        for i in range(k-2):
+        for i in range(3, k+1):
             point2 = add(point, point2, p)
         return point2
     else:
@@ -50,19 +51,24 @@ def getkTable(a, b, p, x, y):
     return list
 
 def generateKey(a, b, p, x, y):
-    x = secrets.choice(range(1,p))
-    ktable = getkTable(2, 1, 5, 0, 1)
-    q = ktable[x-1]
+    try:
+        privateKey = secrets.choice(range(1,p))
+        # q = ktable[privateKey]
+        q = mult((x,y), privateKey, a, p)
+    except:
+        return None
+    
     return {
         "public" : q,
-        "private" : x
+        "private" : privateKey
     }
 
 def encodeKolbitz(plain, a, b, p, k):
-    charlist = '0123456789abcdefghijklmnopqrstuvwxyz'
+    charlist = 'abcdefghijklmnopqrstuvwxyz'
     found = False
     i = 1
     m = charlist.find(plain)
+    print(m)
     while not(found):
         x = m*k + i
         y_squared = ((x**3) + a*x + b) % p
@@ -76,36 +82,77 @@ def encodeKolbitz(plain, a, b, p, k):
 
     return (x, y)
 
+def decodeKobiltz(code, k):
+    charlist = 'abcdefghijklmnopqrstuvwxyz'
+    plain = ''
+    for item in code:
+        #print(item)
+        m = charlist[math.floor((item[0]-1)/k)]
+        plain += m
+    return plain
+
+def encodeECC(char):
+    idx = string.ascii_lowercase.rfind(char)
+    idx = str(idx).zfill(2)
+    return (int(idx[0]), int(idx[1]))
+
+def decodeECC(point):
+    idx = int(str(point[0]) + str(point[1]))
+    char = string.ascii_lowercase[idx]
+    return char
+
 def encrypt(plainteks, basePoint, publicKey, a, b, p, k):
     cipher = []
-    kTable = getkTable(a, b, p, basePoint[0], basePoint[1])
+    #print(kTable)
     for char in plainteks:
-        pm = encodeKolbitz(char, a, b, p, k)
-        print(pm)
+        #print(char)
+        #pm = encodeKolbitz(char, a, b, p, k)
+        pm = encodeECC(char)
+        #pm = (10,10)
+        #print(pm)
         k_enc = secrets.choice(range(1,p))
         #print(k_enc)
-        item1 = kTable[k_enc-1]
+        #item1 = kTable[k_enc]
+        item1 = mult(basePoint, k_enc, a, p)
+        #print(item1)
         item2 = add(pm, mult(publicKey, k_enc, a, p), p)
+        # print(pm)
+        # print("kbB", mult(publicKey, k_enc, a, p))
+        #print(item2)
+        #item2 = (3,2)
         cipher.append((item1, item2))
     return cipher
 
-def decrypt(ciphertext, privateKey, a, p):
+def decrypt(ciphertext, privateKey, a, p, k):
+    plain = ''
     for c in ciphertext:
         x = mult(c[0], privateKey, a , p)
-        #print(x[1])
-        x = (x[0], -x[1]%p)
-        pm = add(c[0], x, p)
-        print(pm)
+        x = (x[0], -x[1])
+        #print("x", x)
+        pm = add(c[1], x, p)
+        #print("pm", pm)
+        #print("bkB", x)
+        plain += decodeECC(pm)
+    return plain
+    # plain = decodeKobiltz(plain, k)
+    # return plain
 
 if __name__ == "__main__":
-    eg = generateElipticGroup(2, 1, 5)
+    eg = generateElipticGroup(1, 6, 47)
     #kt = getkTable(2, 1, 5, 0, 1)
-    alicekey = generateKey(2, 1, 5, eg[0][0], eg[0][1])
-    bobkey = generateKey(2, 1, 5, eg[0][0], eg[0][1])
+    #alicekey = generateKey(2, 1, 5, eg[0][0], eg[0][1])
+    # bobkey = generateKey(1, 6, 47, eg[3][0], eg[3][1])
+    # print(bobkey)
+    #print(bobkey)
     #print(encodeKolbitz('b', -1, 188, 751, 20))
-    #print(add((8,8), (5,9), 11))
+    #print("add:", add((35,4), (8,3), 11))
     #print(mult((5,9), 3, 1, 11))
     #print(encrypt('b', eg[0], key["public"], 2, 1, 5, 3))
-    enc = encrypt('b', eg[0], bobkey["public"], 2, 1, 5, 3)
-    #decrypt(enc, bobkey["private"], 2, 5)
-    
+    teks = 'h'
+    enc = encrypt(teks, eg[3], (2, 4), 1, 6, 47, 3)
+    #print(enc)
+    dec = decrypt(enc, 11, 1, 47, 3)
+    print(dec)
+    if (dec == teks):
+        print("didekripsi menjadi semula")
+    #print(mult((8,3),3,1,11))

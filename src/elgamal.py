@@ -1,18 +1,21 @@
 import secrets
 
-from util import encodeTextOneDigit
+from util import encodeTextOneDigit, isPrime
 
 def generateKey(p):
-    # g < p
-    g = secrets.randbelow(p)
-    # 1 <= x <= p-2
-    x = secrets.choice(range(1,p-1))
-    y = (g ** x) % p
-    keys = {
-        "public" : (y, g, p),
-        "private" : (x, p)
-    }
-    return keys
+    if (isPrime(p)):
+        # g < p
+        g = secrets.randbelow(p)
+        # 1 <= x <= p-2
+        x = secrets.choice(range(1,p-1))
+        y = (g ** x) % p
+        keys = {
+            "public" : (y, g, p),
+            "private" : (x, p)
+        }
+        return keys
+    else:
+        print("p tidak prima")
 
 def pickK(p):
     return secrets.choice(range(1,p-1))
