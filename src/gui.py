@@ -138,16 +138,16 @@ while True:
             input =  util.preprocessPlainText(str(values["input_text"]))
             key = values["key"].split(' ')
             cipher = elgamal.encrypt(input, int(key[0]), int(key[1]), int(key[2]))
-            window["output_text"].update(cipher)
+            window["output_text"].update(str(cipher))
 
     if event == "decrypt":
         if current_mode == "RSA":
             input =  str(values["input_text"])
             key = values["key"].split(' ')
             plain = rsa.decrypt(input, int(key[0]), int(key[1]))
-            window["output_text"].update(rsa.decodeText(plain))
+            window["output_text"].update(util.decodeText(plain))
         if current_mode == "Elgamal":
             input =  str(values["input_text"])
             key = values["key"].split(' ')
             plain = elgamal.decrypt(input, int(key[0]), int(key[1]))
-            window["output_text"].update(plain)
+            window["output_text"].update(util.decodeText(plain))

@@ -1,5 +1,5 @@
-import math, secrets, string
-from util import isPrime, getInversion, encodeText
+import math, secrets
+from util import isPrime, getInversion, encodeText, decodeText
 
 def getPublicKeyList(n):
     # Generate kandidat public key
@@ -8,17 +8,6 @@ def getPublicKeyList(n):
         if math.gcd(i,n) == 1:
             list.append(i)
     return list
-
-def decodeText(c):
-    dec = ''
-    list = []
-    for idx in range(0, len(c), 2):
-        list.append(c[idx:idx+2])
-    
-    for item in list:
-        dec += string.ascii_lowercase[(int(item)-1)%26]
-
-    return dec
 
 def generateKey(p, q):
     if (isPrime(p) and isPrime(q)):

@@ -44,6 +44,17 @@ def decodeTextOneDigit(p):
         dec += char
     return dec
 
+def decodeText(c):
+    dec = ''
+    list = []
+    for idx in range(0, len(c), 2):
+        list.append(c[idx:idx+2])
+    
+    for item in list:
+        dec += string.ascii_lowercase[(int(item)-1)%26]
+
+    return dec
+    
 def preprocessPlainText(plaintext):
     '''
     Preprocess plain text (except for Extended Vigenere Ciphere)
