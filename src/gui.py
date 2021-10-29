@@ -1,5 +1,5 @@
 import PySimpleGUI as sg
-import rsa, paillier, elgamal, ecc
+import rsa, paillier, elgamal, ecc, util
 
 def saveFile(path, content):
     with open("../keys/"+path, 'w') as file:
@@ -64,7 +64,7 @@ window = sg.Window("Tucil 4", layout)
 while True:
     event, values = window.read(timeout = 10)
     event = event.lower()
-    window["Info"].update("Encrypt/Decrypt using: " + str(values["current_action"]))
+    window["Info"].update("Encrypt/Decrypt (26 Alphabet) using: " + str(values["current_action"]))
     if event == sg.WIN_CLOSED: # if user closes window or clicks cancel
         break
     if event == "generatekey":
@@ -129,6 +129,25 @@ while True:
 
     if event == "encrypt":
         # IF per action
-        window["Info"].update("do enc "+str(values["current_action"]))
+        if current_mode == "RSA":
+            input =  util.preprocessPlainText(str(values["input_text"]))
+            key = values["key"].split(' ')
+            cipher = rsa.encrypt(input, int(key[0]), int(key[1]))
+            window["output_text"].update(cipher)
+        if current_mode == "Elgamal":
+            input =  util.preprocessPlainText(str(values["input_text"]))
+            key = values["key"].split(' ')
+            cipher = elgamal.encrypt(input, int(key[0]), int(key[1]), int(key[2]))
+            window["output_text"].update(cipher)
+
     if event == "decrypt":
-        window["Info"].update("do dec "+str(values["current_action"]))
+        if current_mode == "RSA":
+            input =  str(values["input_text"])
+            key = values["key"].split(' ')
+            plain = rsa.decrypt(input, int(key[0]), int(key[1]))
+            window["output_text"].update(rsa.decodeText(plain))
+        if current_mode == "Elgamal":
+            input =  str(values["input_text"])
+            key = values["key"].split(' ')
+            plain = elgamal.decrypt(input, int(key[0]), int(key[1]))
+            window["output_text"].update(plain)
