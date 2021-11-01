@@ -1,6 +1,6 @@
 import secrets
 
-from util import encodeTextOneDigit, isPrime
+from util import decodeText, encodeText, encodeTextOneDigit, isPrime
 
 def generateKey(p):
     if (isPrime(p)):
@@ -21,7 +21,7 @@ def pickK(p):
     return secrets.choice(range(1,p-1))
 
 def encrypt(plainteks, y, g, p):
-    enc = encodeTextOneDigit(plainteks)
+    enc = encodeText(plainteks)
     #print(enc)
     cipher = ''
     nBlock = len(str(p))
@@ -83,13 +83,14 @@ def decrypt(ciphertext, x, p):
     return plain
 
 if __name__ == "__main__":
-    keys = generateKey(2357)
-    print(keys)
-    text = "halohalobandungibukota"
+    keys = generateKey(41)
+    #print(keys)
+    text = "jikaakumenjadi"
     enc = encrypt(text, keys["public"][0], keys["public"][1], keys["public"][2])
-    print(encodeTextOneDigit(text))
+    #print(encodeText(text))
     print(enc)
     dec = decrypt(enc, keys["private"][0], keys["private"][1])
-    print(dec)
-    if (dec == encodeTextOneDigit(text)):
+    #print(dec)
+    if (dec == encodeText(text)):
         print("didekripsi menjadi semula")
+        print(decodeText(dec))
