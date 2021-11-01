@@ -5,6 +5,10 @@ def saveFile(path, content):
     with open("../keys/"+path, 'w') as file:
         file.write(content)
 
+def readFile(path):
+    file = open(path, "r")
+    return file.read()
+
 sg.theme("Reddit")
 layout = [
     [sg.T("Tucil 4 Kriptografi Modern", font="Any 20")],
@@ -55,7 +59,7 @@ layout = [
     ],
     [sg.Text("", key="Info")],
     [sg.T("Input", size=(5, 1)), sg.Multiline(key="input_text", size=(35, 7)), sg.T("Output", size=(5, 1)), sg.Multiline(key="output_text", size=(35, 7))],
-    [sg.T("Key", size=(5, 1)), sg.In(key="key", size=(60, 1)), sg.Button("BrowseKey", pad=(5, 10))],
+    [sg.T("Key", size=(5, 1)), sg.In(key="key", size=(60, 1)), sg.Text("Key Filepath:"), sg.Input(size=(5, 1)), sg.FileBrowse(key='upload_key_loc'), sg.Button("SelectKey")],
     [sg.Button("Encrypt", pad=(5, 10)), sg.Button("Decrypt", pad=(5, 10))],
 ]
 
@@ -116,7 +120,10 @@ while True:
             window["filename"].update("filename kosong")
         else:
             contentLoc = "public_out_" + current_mode.lower()
-            saveFile(values["filename"], values[contentLoc])
+            content = ""
+            for value in eval(values[contentLoc]):
+                content += str(value) + " "
+            saveFile(values["filename"], content.rstrip())
             window["filename"].update("tersimpan di folder keys")
 
     if event == "saveprivatekey":
@@ -124,7 +131,10 @@ while True:
             window["filename"].update("filename kosong")
         else:
             contentLoc = "private_out_" + current_mode.lower()
-            saveFile(values["filename"], values[contentLoc])
+            content = ""
+            for value in eval(values[contentLoc]):
+                content += str(value) + " "
+            saveFile(values["filename"], content.rstrip())
             window["filename"].update("tersimpan di folder keys")
 
     if event == "encrypt":
@@ -139,6 +149,17 @@ while True:
             key = values["key"].split(' ')
             cipher = elgamal.encrypt(input, int(key[0]), int(key[1]), int(key[2]))
             window["output_text"].update(str(cipher))
+        if current_mode == "Paillier":
+            input =  util.preprocessPlainText(str(values["input_text"]))
+            key = values["key"].split(' ')
+            cipher = paillier.encrypt(input, int(key[0]), int(key[1]))
+            window["output_text"].update(str(cipher))
+        if current_mode == "ECEG":
+            input =  util.preprocessPlainText(str(values["input_text"]))
+            key = values["key"].split(' ')
+            basepoint = eval(values["base_point_eceg"])
+            cipher = ecc.encrypt(input, basepoint, (int(key[0]), int(key[1])), int(values["a_val_eceg"]), int(values["b_val_eceg"]), int(values["p_val_eceg"]), 3)
+            window["output_text"].update(str(cipher))
 
     if event == "decrypt":
         if current_mode == "RSA":
@@ -151,3 +172,17 @@ while True:
             key = values["key"].split(' ')
             plain = elgamal.decrypt(input, int(key[0]), int(key[1]))
             window["output_text"].update(util.decodeText(plain))
+        if current_mode == "Paillier":
+            input =  str(values["input_text"])
+            key = values["key"].split(' ')
+            plain = paillier.decrypt(input, int(key[0]), int(key[1]), int(key[2]))
+            window["output_text"].update(plain)
+        if current_mode == "ECEG":
+            input =  util.preprocessPlainText(str(values["input_text"]))
+            key = values["key"]
+            basepoint = eval(values["base_point_eceg"])
+            plain = ecc.decrypt(input, int(key), int(values["a_val_eceg"]), int(values["p_val_eceg"]), 3)
+            window["output_text"].update(plain)
+
+    if event == "selectkey":
+        window["key"].update(readFile(values["upload_key_loc"]))

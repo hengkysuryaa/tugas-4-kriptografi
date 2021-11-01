@@ -2,6 +2,8 @@ import secrets, math
 import string
 
 def add(p1, p2, p):
+    if (p2[0] - p1[0] == 0):
+        return p1
     #print(p2[1] - p1[1], p2[0] - p1[0])
     m = ((p2[1] - p1[1]) * pow((p2[0] - p1[0]), -1, p)) % p
     xr = ((m**2) - p1[0] - p2[0]) % p
@@ -132,6 +134,7 @@ def decrypt(ciphertext, privateKey, a, p, k):
         pm = add(c[1], x, p)
         #print("pm", pm)
         #print("bkB", x)
+        print(pm)
         plain += decodeECC(pm)
     return plain
     # plain = decodeKobiltz(plain, k)
@@ -148,7 +151,7 @@ if __name__ == "__main__":
     #print("add:", add((35,4), (8,3), 11))
     #print(mult((5,9), 3, 1, 11))
     #print(encrypt('b', eg[0], key["public"], 2, 1, 5, 3))
-    teks = 'h'
+    teks = 'hello'
     enc = encrypt(teks, eg[3], (2, 4), 1, 6, 47, 3)
     #print(enc)
     dec = decrypt(enc, 11, 1, 47, 3)
