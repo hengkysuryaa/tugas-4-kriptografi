@@ -106,37 +106,44 @@ def decodeECC(point):
 def encrypt(plainteks, basePoint, publicKey, a, b, p, k):
     cipher = []
     #print(kTable)
-    for char in plainteks:
-        #print(char)
-        #pm = encodeKolbitz(char, a, b, p, k)
-        pm = encodeECC(char, p)
-        #pm = (10,10)
-        #print(pm)
-        k_enc = secrets.choice(range(1,p))
-        #print(k_enc)
-        #item1 = kTable[k_enc]
-        item1 = mult(basePoint, k_enc, a, p)
-        #print(item1)
-        item2 = add(pm, mult(publicKey, k_enc, a, p), p)
-        # print(pm)
-        # print("kbB", mult(publicKey, k_enc, a, p))
-        #print(item2)
-        #item2 = (3,2)
-        cipher.append((item1, item2))
-    return cipher
+    try:
+        for char in plainteks:
+            #print(char)
+            #pm = encodeKolbitz(char, a, b, p, k)
+            pm = encodeECC(char, p)
+            #pm = (10,10)
+            #print(pm)
+            k_enc = secrets.choice(range(1,p))
+            #print("k:", k_enc)
+            #print(k_enc)
+            #item1 = kTable[k_enc]
+            item1 = mult(basePoint, k_enc, a, p)
+            #print(item1)
+            item2 = add(pm, mult(publicKey, k_enc, a, p), p)
+            # print(pm)
+            # print("kbB", mult(publicKey, k_enc, a, p))
+            #print(item2)
+            #item2 = (3,2)
+            cipher.append((item1, item2))
+        return cipher
+    except:
+        return None
 
 def decrypt(ciphertext, privateKey, a, p, k):
     plain = ''
-    for c in ciphertext:
-        x = mult(c[0], privateKey, a , p)
-        x = (x[0], -x[1])
-        #print("x", x)
-        pm = add(c[1], x, p)
-        #print("pm", pm)
-        #print("bkB", x)
-        #print(pm)
-        plain += decodeECC(pm)
-    return plain
+    try:
+        for c in ciphertext:
+            x = mult(c[0], privateKey, a , p)
+            x = (x[0], -x[1])
+            #print("x", x)
+            pm = add(c[1], x, p)
+            #print("pm", pm)
+            #print("bkB", x)
+            #print(pm)
+            plain += decodeECC(pm)
+        return plain
+    except:
+        return None
     # plain = decodeKobiltz(plain, k)
     # return plain
 

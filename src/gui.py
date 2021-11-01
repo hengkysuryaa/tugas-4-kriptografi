@@ -69,13 +69,15 @@ while True:
     event, values = window.read(timeout = 10)
     event = event.lower()
     window["Info"].update("Encrypt/Decrypt (26 Alphabet) using: " + str(values["current_action"]))
+    current_mode = values["current_action"]
+    if values["current_action"] == "ECEG":
+        window["Info"].update("Encrypt/Decrypt (26 Alphabet) using: " + str(values["current_action"] + "\nPlease fill a,b,p,BasePoint in above section before encrypt/decrypt"))
     if event == sg.WIN_CLOSED: # if user closes window or clicks cancel
         break
     if event == "generatekey":
         #print(event)
         #print("Action:", values["current_action"])
         #window["Info"].update("do key"+str(values["current_action"]))
-        current_mode = values["current_action"]
         if current_mode == "RSA":
             keys = rsa.generateKey(int(values["p_val_rsa"]), int(values["q_val_rsa"]))
             if keys == None:
