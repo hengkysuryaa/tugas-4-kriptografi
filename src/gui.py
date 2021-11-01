@@ -159,7 +159,16 @@ while True:
             key = values["key"].split(' ')
             basepoint = eval(values["base_point_eceg"])
             cipher = ecc.encrypt(input, basepoint, (int(key[0]), int(key[1])), int(values["a_val_eceg"]), int(values["b_val_eceg"]), int(values["p_val_eceg"]), 3)
-            window["output_text"].update(str(cipher))
+            result = ""
+            for item in cipher:
+                item1 = item[0]
+                item2 = item[1]
+                x1 = item1[0]
+                y1 = item1[1]
+                x2 = item2[0]
+                y2 = item2[1]
+                result += str(x1) + " " + str(y1) + " " + str(x2) + " " + str(y2) + "\n"
+            window["output_text"].update(result)
 
     if event == "decrypt":
         if current_mode == "RSA":
@@ -176,12 +185,20 @@ while True:
             input =  str(values["input_text"])
             key = values["key"].split(' ')
             plain = paillier.decrypt(input, int(key[0]), int(key[1]), int(key[2]))
-            window["output_text"].update(plain)
+            window["output_text"].update(util.decodeText(plain))
         if current_mode == "ECEG":
-            input =  util.preprocessPlainText(str(values["input_text"]))
+            input =  values["input_text"]
+            point_list = []
+            for item in input.split('\n'):
+                item = item.split(' ')
+                tuple1 = (int(item[0]), int(item[1]))
+                tuple2 = (int(item[2]), int(item[3]))
+                point_list.append((tuple1, tuple2))
+            #print(point_list)
             key = values["key"]
             basepoint = eval(values["base_point_eceg"])
-            plain = ecc.decrypt(input, int(key), int(values["a_val_eceg"]), int(values["p_val_eceg"]), 3)
+            plain = ecc.decrypt(point_list, int(key), int(values["a_val_eceg"]), int(values["p_val_eceg"]), 3)
+            #print(plain)
             window["output_text"].update(plain)
 
     if event == "selectkey":

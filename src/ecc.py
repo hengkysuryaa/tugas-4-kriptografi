@@ -93,14 +93,14 @@ def decodeKobiltz(code, k):
         plain += m
     return plain
 
-def encodeECC(char):
+def encodeECC(char, p):
     idx = string.ascii_lowercase.rfind(char)
-    idx = str(idx).zfill(2)
-    return (int(idx[0]), int(idx[1]))
+    #idx = str(idx)
+    return (idx+1, idx+p)
 
 def decodeECC(point):
-    idx = int(str(point[0]) + str(point[1]))
-    char = string.ascii_lowercase[idx]
+    idx = int(point[0])
+    char = string.ascii_lowercase[(idx-1)%26]
     return char
 
 def encrypt(plainteks, basePoint, publicKey, a, b, p, k):
@@ -109,7 +109,7 @@ def encrypt(plainteks, basePoint, publicKey, a, b, p, k):
     for char in plainteks:
         #print(char)
         #pm = encodeKolbitz(char, a, b, p, k)
-        pm = encodeECC(char)
+        pm = encodeECC(char, p)
         #pm = (10,10)
         #print(pm)
         k_enc = secrets.choice(range(1,p))
@@ -134,7 +134,7 @@ def decrypt(ciphertext, privateKey, a, p, k):
         pm = add(c[1], x, p)
         #print("pm", pm)
         #print("bkB", x)
-        print(pm)
+        #print(pm)
         plain += decodeECC(pm)
     return plain
     # plain = decodeKobiltz(plain, k)
@@ -151,7 +151,7 @@ if __name__ == "__main__":
     #print("add:", add((35,4), (8,3), 11))
     #print(mult((5,9), 3, 1, 11))
     #print(encrypt('b', eg[0], key["public"], 2, 1, 5, 3))
-    teks = 'hello'
+    teks = 'thequickbrownfoxjumpsoverthelazydog'
     enc = encrypt(teks, eg[3], (2, 4), 1, 6, 47, 3)
     #print(enc)
     dec = decrypt(enc, 11, 1, 47, 3)
