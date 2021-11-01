@@ -1,6 +1,6 @@
 import secrets, math
 from rsa import decrypt
-from util import encodeText, isPrime, getInversion
+from util import decodeText, encodeText, isPrime, getInversion, encodeTextOneDigit, decodeTextOneDigit
 
 def L(x, n):
     return int((x-1)/n)
@@ -12,16 +12,19 @@ def generateKey(p, q):
     if (isPrime(p) and isPrime(q) and (math.gcd(p*q, (p-1)*(q-1)) == 1)):
         n = p * q
         lamb = math.lcm(p-1, q-1)
-        found = False
-        while not(found): # mitigasi not invertible
-            g = secrets.randbelow(n**2)
-            l = L((g**lamb) % (n**2), n)
-            miu = getInversion(n, l) 
-            if miu != None:
-                found = True
+        # found = False
+        # while not(found): # mitigasi not invertible
+        #     g = secrets.randbelow(n**2)
+        #     l = L((g**lamb) % (n**2), n)
+        #     miu = getInversion(n, l) 
+        #     if miu != None:
+        #         found = True
+        g = n + 1
+        l = L((g**lamb) % (n**2), n)
+        miu = getInversion(n, l) 
         keys = {
             "public" : (g, n),
-            "private" : (lamb, miu)
+            "private" : (lamb, miu, n)
         }
         return keys
     else:
@@ -45,24 +48,41 @@ def encrypt(plainteks, g, n):
     r = secrets.choice(getRList(n))
     i = 0
     while i < (len(enc) - (len(enc) % nBlock)):
-        val = int(enc[i:i+nBlock])
+        strVal = enc[i:i+nBlock]
+        val = int(strVal)
+        isStartZero = False
+        if (enc[i:i+nBlock][0] == '0'):
+            isStartZero = True
         # cek apakah val >= n
         if val >= n:
-            # ciphering 
-            val = int(enc[i:i+nBlock-1])
+            # ciphering
+            strVal = enc[i:i+nBlock-1]
+            val = int(strVal)
             i -= 1
-        i += nBlock
         c = ((g**val) * (r**n)) % (n**2)
-        cipher += str(c) + " "
-        #print(val, c)
+        if isStartZero:
+            nPadding = len(strVal) - len(str(val))
+            cipher += str(c).zfill(nPadding+len(str(c))) + " "
+        else:
+            cipher += str(c) + " "
+        i += nBlock
+        #print(strVal, c)
 
     # sisa angka, jika ada
     if (i < len(enc)):
         val = int(enc[i:])
+        isStartZero = False
+        if (enc[i:] == '0'):
+            isStartZero = True
         c = ((g**val) * (r**n)) % (n**2)
-        cipher += str(c) + " "
+        if isStartZero:
+            nPadding = len(enc[i:]) - len(str(val))
+            cipher += str(c).zfill(nPadding+len(str(c))) + " "
+        else:
+            cipher += str(c) + " "
         #print("sisa", enc[i:], c)
         #print("cipher", cipher)
+    #print(cipher.rstrip())
     return cipher.rstrip()
 
 def decrypt(ciphertext, lamb, miu, n):
@@ -74,25 +94,31 @@ def decrypt(ciphertext, lamb, miu, n):
     for item in cipher_list:
         val = int(item)
         p = (L((val**lamb) % (n**2), n) * miu) % n
-        #print(val, p)
-        if (p < 10):
-            plain += str(p).zfill(2)
-        else:
-            plain += str(p)
+        #print(item, p)
+        # if (p < 10):
+        #     plain += str(p).zfill(2)
+        # else:
+        #     plain += str(p)
+        i = 0
+        while (item[i] == "0"):
+            plain += "0"
+            i += 1
+        plain += str(p)
 
     return plain
 
 if __name__ == "__main__":
-    p = 7
-    q = 11
+    p = 43
+    q = 37
     if (checkKey(p, q)):
         keys = generateKey(p, q)
-        teks = "akusedangbelajarrajadannaif"
+        teks = "thequickbrownfoxjumpsoverthelazydog"
         print(teks)
         enc = encrypt(teks, keys["public"][0], keys["public"][1])
-        print(enc)
+        #print(enc)
         dec = decrypt(enc, keys["private"][0], keys["private"][1], keys["public"][1])
-        print(encodeText(teks))
-        print(dec)
+        #print(encodeText(teks))
+        #print(dec)
         if (dec == encodeText(teks)):
+            print("hasil enkripsi", decodeText(dec))
             print("didekripsi menjadi semula")
