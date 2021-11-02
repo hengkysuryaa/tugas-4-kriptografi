@@ -129,10 +129,14 @@ while True:
             window["filename"].update("filename kosong")
         else:
             contentLoc = "private_out_" + current_mode.lower()
-            content = ""
-            for value in eval(values[contentLoc]):
-                content += str(value) + " "
-            saveFile(values["filename"], content.rstrip())
+            if current_mode == "ECEG":
+                content = values[contentLoc]
+                saveFile(values["filename"], content)
+            else:
+                content = ""
+                for value in eval(values[contentLoc]):
+                    content += str(value) + " "
+                saveFile(values["filename"], content.rstrip())
             window["filename"].update("tersimpan di folder keys")
 
     if event == "encrypt":

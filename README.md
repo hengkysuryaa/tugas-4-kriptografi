@@ -8,7 +8,7 @@ Implementasi Algoritma RSA, ElGamal, Paillier, ECC
 ## Structure
 - `src` contains all the source code
 - `keys` is the location of saved keys
-- 
+
 ## How To Run
 - Open terminal in `src` directory and run command `python gui.py` 
 - Or, double click `gui.py`
