@@ -25,8 +25,6 @@ def generateKey(p, q):
         print("p, q tidak prima")
 
 def encrypt(plaintext, e, n):
-    # TODO: apakah 26 alphabet saja, m bebas (?), jika m tidak habis dibagi pesan
-    # output angka/teks
     enc = encodeText(plaintext)
     cipher = ''
     nBlock = len(str(n))
@@ -41,14 +39,12 @@ def encrypt(plaintext, e, n):
         i += nBlock
         c = (val ** e) % n
         cipher += str(c).zfill(nBlock)
-        #print(val, c)
 
     # sisa angka, jika ada
     if (i < len(enc)):
         c = (int(enc[i:]) ** e) % n
         cipher += str(c).zfill(nBlock)
-        #print("sisa", enc[i:], c)
-        #print("cipher", cipher)
+
     return cipher
 
 def decrypt(ciphertext, d, n):
@@ -69,7 +65,6 @@ def decrypt(ciphertext, d, n):
             plain += str(p).zfill(len(str(p))+1)
         else:
             plain += str(p)
-        #print(val, c)
 
     # sisa angka, jika ada
     if (i < len(dec)):
@@ -78,7 +73,7 @@ def decrypt(ciphertext, d, n):
             plain += str(p).zfill(len(str(p))+1)
         else:
             plain += str(p)
-        #print("sisa", enc[i:], c)
+
     return plain
     
 if __name__ == "__main__":

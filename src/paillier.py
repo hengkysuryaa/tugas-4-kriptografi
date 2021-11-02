@@ -1,6 +1,6 @@
 import secrets, math
 from rsa import decrypt
-from util import decodeText, encodeText, isPrime, getInversion, encodeTextOneDigit, decodeTextOneDigit
+from util import decodeText, encodeText, isPrime, getInversion
 
 def L(x, n):
     return int((x-1)/n)
@@ -39,10 +39,7 @@ def getRList(n):
     return list
 
 def encrypt(plainteks, g, n):
-    # TODO input teks/angka
-    # encode
     enc = encodeText(plainteks)
-    #print(enc)
     cipher = ''
     nBlock = len(str(n))
     r = secrets.choice(getRList(n))
@@ -66,7 +63,6 @@ def encrypt(plainteks, g, n):
         else:
             cipher += str(c) + " "
         i += nBlock
-        #print(strVal, c)
 
     # sisa angka, jika ada
     if (i < len(enc)):
@@ -80,25 +76,15 @@ def encrypt(plainteks, g, n):
             cipher += str(c).zfill(nPadding+len(str(c))) + " "
         else:
             cipher += str(c) + " "
-        #print("sisa", enc[i:], c)
-        #print("cipher", cipher)
-    #print(cipher.rstrip())
+
     return cipher.rstrip()
 
 def decrypt(ciphertext, lamb, miu, n):
-    # encode
-    #enc = encodeTextPailier(plainteks)
-    #print(enc)
     cipher_list = ciphertext.split(" ")
     plain = ''
     for item in cipher_list:
         val = int(item)
         p = (L((val**lamb) % (n**2), n) * miu) % n
-        #print(item, p)
-        # if (p < 10):
-        #     plain += str(p).zfill(2)
-        # else:
-        #     plain += str(p)
         i = 0
         while (item[i] == "0"):
             plain += "0"
@@ -120,5 +106,5 @@ if __name__ == "__main__":
         #print(encodeText(teks))
         #print(dec)
         if (dec == encodeText(teks)):
-            print("hasil enkripsi", decodeText(dec))
+            print("hasil dekripsi", decodeText(dec))
             print("didekripsi menjadi semula")

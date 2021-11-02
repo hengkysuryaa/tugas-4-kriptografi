@@ -4,7 +4,6 @@ import string
 def add(p1, p2, p):
     if (p2[0] - p1[0] == 0):
         return p1
-    #print(p2[1] - p1[1], p2[0] - p1[0])
     m = ((p2[1] - p1[1]) * pow((p2[0] - p1[0]), -1, p)) % p
     xr = ((m**2) - p1[0] - p2[0]) % p
     yr = (m*(p1[0] - xr) - p1[1]) % p
@@ -43,8 +42,6 @@ def getkTable(a, b, p, x, y):
     yr = (m*(x-xr) - y) % p
     list.append((xr, yr))
     for i in range(2, len(eg)):
-        # print(list)
-        # print(list[i-1][1] - list[0][1])
         m = ((list[i-1][1] - list[0][1]) * pow((list[i-1][0] - list[0][0]), -1, p)) % p
         xr = ((m**2) - list[0][0] - list[i-1][0]) % p
         yr = (m*(list[0][0] - xr) - list[0][1]) % p
@@ -88,14 +85,12 @@ def decodeKobiltz(code, k):
     charlist = 'abcdefghijklmnopqrstuvwxyz'
     plain = ''
     for item in code:
-        #print(item)
         m = charlist[math.floor((item[0]-1)/k)]
         plain += m
     return plain
 
 def encodeECC(char, p):
     idx = string.ascii_lowercase.rfind(char)
-    #idx = str(idx)
     return (idx+1, idx+p)
 
 def decodeECC(point):
@@ -105,25 +100,14 @@ def decodeECC(point):
 
 def encrypt(plainteks, basePoint, publicKey, a, b, p, k):
     cipher = []
-    #print(kTable)
     try:
         for char in plainteks:
-            #print(char)
             #pm = encodeKolbitz(char, a, b, p, k)
             pm = encodeECC(char, p)
-            #pm = (10,10)
             #print(pm)
             k_enc = secrets.choice(range(1,p))
-            #print("k:", k_enc)
-            #print(k_enc)
-            #item1 = kTable[k_enc]
             item1 = mult(basePoint, k_enc, a, p)
-            #print(item1)
             item2 = add(pm, mult(publicKey, k_enc, a, p), p)
-            # print(pm)
-            # print("kbB", mult(publicKey, k_enc, a, p))
-            #print(item2)
-            #item2 = (3,2)
             cipher.append((item1, item2))
         return cipher
     except:
@@ -135,17 +119,12 @@ def decrypt(ciphertext, privateKey, a, p, k):
         for c in ciphertext:
             x = mult(c[0], privateKey, a , p)
             x = (x[0], -x[1])
-            #print("x", x)
             pm = add(c[1], x, p)
-            #print("pm", pm)
-            #print("bkB", x)
             #print(pm)
             plain += decodeECC(pm)
         return plain
     except:
         return None
-    # plain = decodeKobiltz(plain, k)
-    # return plain
 
 if __name__ == "__main__":
     eg = generateElipticGroup(1, 6, 47)
@@ -159,9 +138,9 @@ if __name__ == "__main__":
     #print(mult((5,9), 3, 1, 11))
     #print(encrypt('b', eg[0], key["public"], 2, 1, 5, 3))
     teks = 'thequickbrownfoxjumpsoverthelazydog'
-    enc = encrypt(teks, eg[3], (2, 4), 1, 6, 47, 3)
+    enc = encrypt(teks, eg[3], (13, 17), 1, 6, 47, 3)
     #print(enc)
-    dec = decrypt(enc, 11, 1, 47, 3)
+    dec = decrypt(enc, 7, 1, 47, 3)
     print(dec)
     if (dec == teks):
         print("didekripsi menjadi semula")

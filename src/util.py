@@ -12,9 +12,6 @@ def isPrime(x):
 
 def getInversion(n, m):
     # cari inversi m (mod n)   
-    # for i in range(1,n):
-    #     if ((m*i) % n == 1):
-    #         return i
     try:
         val = pow(m, -1, n)
         return val

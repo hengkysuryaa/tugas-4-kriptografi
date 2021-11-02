@@ -75,9 +75,6 @@ while True:
     if event == sg.WIN_CLOSED: # if user closes window or clicks cancel
         break
     if event == "generatekey":
-        #print(event)
-        #print("Action:", values["current_action"])
-        #window["Info"].update("do key"+str(values["current_action"]))
         if current_mode == "RSA":
             keys = rsa.generateKey(int(values["p_val_rsa"]), int(values["q_val_rsa"]))
             if keys == None:
@@ -115,8 +112,7 @@ while True:
     if event == "generateelipticgroup":
         eg = ecc.generateElipticGroup(int(values["a_val_eceg"]), int(values["b_val_eceg"]), int(values["p_val_eceg"]))
         window["eliptic_group_list"].update(eg)
-        #print(eg)
-        #keys = ecc.generateKey(int(values["p_val_paillier"]), int(values["q_val_paillier"]))
+
     if event == "savepublickey":
         if values["filename"] == "":
             window["filename"].update("filename kosong")
@@ -196,11 +192,11 @@ while True:
                 tuple1 = (int(item[0]), int(item[1]))
                 tuple2 = (int(item[2]), int(item[3]))
                 point_list.append((tuple1, tuple2))
-            #print(point_list)
+            
             key = values["key"]
             basepoint = eval(values["base_point_eceg"])
             plain = ecc.decrypt(point_list, int(key), int(values["a_val_eceg"]), int(values["p_val_eceg"]), 3)
-            #print(plain)
+            
             window["output_text"].update(plain)
 
     if event == "selectkey":
