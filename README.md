@@ -1,13 +1,17 @@
 # tugas-4-kriptografi
 Implementasi Algoritma RSA, ElGamal, Paillier, ECC
 
-# Prerequisite
+## Prerequisite
 - Python 3.9
 - PySimpleGUI, installation via pip `pip install PySimpleGUI`
 
-# How To Run
-- Open terminal in root directory and `python gui.py` 
-- Double click `gui.py`
+## Structure
+- `src` contains all the source code
+- `keys` is the location of saved keys
+- 
+## How To Run
+- Open terminal in `src` directory and run command `python gui.py` 
+- Or, double click `gui.py`
 
-# Notes:
+## Notes:
 - Keys will be saved in `keys` folder 
